@@ -1,0 +1,21 @@
+{
+  "name": "guia-cubo-rubik",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Guía visual e interactiva para resolver el cubo de Rubik capa a capa.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test:engine": "node scripts/engine.test.mjs"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}

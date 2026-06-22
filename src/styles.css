@@ -1,0 +1,39 @@
+:root {
+  color-scheme: dark;
+  --bg: #16181d;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+#root { min-height: 100vh; }
+
+/* Selección y foco coherentes con la paleta amarilla */
+::selection { background: #fdd83555; }
+
+button { font: inherit; }
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #fdd835;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Scrollbar discreta en navegadores WebKit */
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: #16181d; }
+::-webkit-scrollbar-thumb { background: #2e343f; border-radius: 6px; border: 3px solid #16181d; }
+::-webkit-scrollbar-thumb:hover { background: #3a4250; }
+
+/* Respeta a quien prefiere menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
