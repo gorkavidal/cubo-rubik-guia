@@ -25,3 +25,6 @@ pnpm-debug.log*
 # Material original de referencia (no forma parte de la app)
 files.zip
 files_extracted/
+
+# Claude conversation logs
+.claude/conversations/
