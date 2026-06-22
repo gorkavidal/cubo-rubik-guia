@@ -66,8 +66,8 @@ export default function CubeAnimation({ setup = "", moves = "", size = 168, ms =
             if (idxRef.current >= list.length) { phaseRef.current = "pause"; }
           }
         }
-      } else { // pause → reiniciar el bucle
-        if (t > PAUSE) { resetBase(); t0Ref.current = now; }
+      } else { // terminada → espera, vuelve a la posición inicial y se detiene (sin bucle)
+        if (t > PAUSE) { resetBase(); force(); setPlaying(false); return; }
       }
       force();
       raf = requestAnimationFrame(step);
