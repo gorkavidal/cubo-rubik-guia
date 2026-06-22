@@ -61,8 +61,10 @@ function StepHeader({ step }) {
       <p style={{ fontFamily: FONT_BODY, fontSize: 14.5, color: T.text, margin: "10px 0 0", lineHeight: 1.6 }}>{step.goal}</p>
       {step.why && (
         <div style={{ borderLeft: "3px solid " + T.accent, background: T.panel2, borderRadius: "0 10px 10px 0", padding: "12px 16px", margin: "16px 0 4px" }}>
-          <div style={{ fontFamily: FONT_MONO, fontSize: 11, color: T.accent, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 5 }}>¿Por qué funciona?</div>
-          <p style={{ fontFamily: FONT_BODY, fontSize: 13.5, color: T.muted, margin: 0, lineHeight: 1.65 }}>{step.why}</p>
+          <div style={{ fontFamily: FONT_MONO, fontSize: 11, color: T.accent, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 5 }}>{step.whyLabel || "¿Por qué funciona?"}</div>
+          {Array.isArray(step.why)
+            ? step.why.map((p, i) => <p key={i} style={{ fontFamily: FONT_BODY, fontSize: 13.5, color: T.muted, margin: i ? "10px 0 0" : 0, lineHeight: 1.65 }}>{p}</p>)
+            : <p style={{ fontFamily: FONT_BODY, fontSize: 13.5, color: T.muted, margin: 0, lineHeight: 1.65 }}>{step.why}</p>}
         </div>
       )}
     </div>

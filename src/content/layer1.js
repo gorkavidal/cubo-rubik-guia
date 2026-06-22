@@ -1,58 +1,99 @@
 /* ===========================================================================
-   CAPA 1 · PRIMERA CAPA (cara blanca) — método de la MARGARITA
-   El más fácil para empezar: no hay que voltear el cubo ni reconocer casos.
-   Se sostiene SIEMPRE con el amarillo arriba (igual que en las capas 2 y 3).
-   Diagramas con colores plenos y formato antes → después, generados por el
-   motor y verificados.
+   CAPA 1 · PRIMERA CAPA (cara blanca) — enseñada de forma RAZONADA
+   No "aplica este algoritmo": aprender a LEER el cubo (qué pieza, dónde vive,
+   hacia dónde mira) y razonar el movimiento. Amarillo siempre arriba.
+   Estados de los diagramas verificados con el motor.
    =========================================================================== */
 
 export const LAYER1 = {
   id: "capa-1",
   title: "Capa 1 · La cara blanca",
   short: "Capa 1",
-  intro: "Empezamos por la base. El método de la margarita es el más sencillo para alguien que acaba de coger el cubo: no hay algoritmos raros ni que dar la vuelta al cubo. Sostén el cubo con el centro AMARILLO mirando arriba y déjalo así toda la capa.",
-  idea: "Truco mental: el blanco va abajo y el amarillo arriba (son caras opuestas). En vez de pelear con la cara de abajo, que no ves, juntamos primero las cuatro aristas blancas ARRIBA formando una flor (la «margarita») y luego las dejamos caer a su sitio. Solo hay que mirar colores; nada de memorizar.",
+  intro: "La primera capa se hace pensando, no de memoria. Aquí no vas a aplicar fórmulas a ciegas: vas a aprender a leer el cubo —qué es cada pieza y a dónde pertenece— y a mover con intención. Sostén el cubo con el centro amarillo mirando arriba y déjalo así toda la capa.",
+  idea: "Las dos primeras capas se resuelven razonando, no recitando. Si entiendes qué pieza tienes delante y dónde es su sitio, el movimiento casi se piensa solo. Los pocos gestos que usamos son cortos y vas a entender qué hace cada uno.",
   steps: [
     {
-      id: "cruz-blanca", title: "La cruz blanca (margarita)",
-      goal: "Formar una cruz blanca en la cara de abajo, con cada arista casando su segundo color con el centro de su cara. Lo conseguimos en dos tiempos: primero una flor blanca arriba, y luego bajamos cada pétalo.",
-      why: "Con el amarillo arriba, el centro de abajo es blanco. Una «margarita» es el centro amarillo de arriba rodeado de cuatro aristas blancas (los pétalos): es muy fácil de montar porque solo buscas aristas que tengan blanco y las subes arriba, sin pensar en el otro color. Una vez tienes un pétalo, lo giras (moviendo solo la cara de arriba) hasta que su otro color quede pegado al centro de su misma cara; entonces lo bajas con un giro doble de esa cara y cae justo en su sitio de la cruz, sin estropear los demás pétalos. Repites con los cuatro. El giro doble es la clave: al girar 180° esa cara, el pétalo pasa de arriba a abajo en línea recta.",
+      id: "mirar", title: "Primero: aprende a mirar",
+      goal: "Antes de tocar nada, hay que saber leer el cubo. Con tres ideas lo verás de otra forma y todo lo demás cae por su propio peso. Dedícale un minuto: es lo que separa resolver de memorizar.",
+      whyLabel: "Las tres claves para leer el cubo",
+      why: [
+        "1) Los centros mandan. La pieza del medio de cada cara no se mueve de sitio respecto a las demás: define de qué color es esa cara para siempre. Si el centro de abajo es blanco, la cara de abajo será la blanca; el de arriba, amarillo. Resolver el cubo no es «pintar caras», es llevar cada pieza junto a los centros que le corresponden.",
+        "2) Hay tres tipos de pieza. Los centros (una sola pegatina). Las aristas, en mitad de cada borde, con dos pegatinas: hay 12. Y las esquinas, en los vértices, con tres pegatinas: hay 8. Esto es lo importante: una pieza solo encaja en UN sitio. La arista blanco-verde solo tiene un hogar —el borde entre la cara blanca y la verde— porque es la única que tiene esos dos colores. Mira los colores de una pieza y sabrás exactamente a dónde va.",
+        "3) Posición y orientación son cosas distintas. Una pieza puede estar en su sitio pero girada del revés. «Resuelta» significa sitio correcto Y bien orientada. En la cruz, una arista blanca puede estar en el borde correcto pero con el blanco mirando al lado en vez de hacia el centro blanco: está medio resuelta, hay que darle la vuelta. Acostúmbrate a preguntarte siempre dos cosas: ¿está en su sitio? y ¿está bien girada?",
+      ],
+      grid: true,
+      cases: [
+        { name: "Los centros no se mueven", note: "Las tres piezas centrales (amarillo arriba, verde y rojo) marcan el color de su cara. Gires lo que gires, su posición relativa no cambia: son tu mapa.", cube: { alg: "", labels: true, highlight: ["U:1,1", "F:1,1", "R:1,1"] } },
+        { name: "Una arista = 2 colores", note: "Las aristas viven en mitad de los bordes. Esta tiene amarillo y verde: su hogar es el borde entre la cara amarilla y la verde. Sus dos colores te dicen dónde va.", cube: { alg: "", labels: true, highlight: ["U:2,1", "F:0,1"] } },
+        { name: "Una esquina = 3 colores", note: "Las esquinas viven en los vértices. Esta tiene amarillo, verde y rojo: solo encaja en el rincón donde se juntan esas tres caras. Tres colores, un único rincón.", cube: { alg: "", labels: true, highlight: ["U:2,2", "F:0,2", "R:0,0"] } },
+      ],
+    },
+    {
+      id: "cruz-blanca", title: "La cruz blanca",
+      goal: "Las cuatro aristas que llevan blanco, colocadas alrededor del centro blanco y —esto es lo que casi todos olvidan— cada una con su segundo color pegado al centro de su color. Una cruz bien hecha tiene los cuatro brazos casando: el tramo blanco-rojo toca el centro rojo, el blanco-verde toca el verde…",
+      whyLabel: "Cómo razonarla (no es magia)",
+      why: [
+        "Coge cualquier arista que tenga blanco y hazte las dos preguntas de siempre: ¿dónde está? y ¿a dónde va? Su segundo color responde lo segundo: la blanco-roja va a la cara roja, sin más. El problema es que su sitio final está ABAJO, donde no lo ves bien. Solución: reúne primero las cuatro aristas blancas ARRIBA, formando una flor (la «margarita») alrededor del centro amarillo. Arriba las ves todas y las mueves con comodidad. Por eso empezamos por la flor: no es un truco, es ponerte el trabajo donde lo controlas.",
+        "Con la flor hecha, baja las aristas una a una, pero PENSANDO. Antes de bajar un pétalo, gira solo la cara de arriba hasta que el segundo color de ese pétalo quede pegado al centro de su misma cara (verde con verde). ¿Por qué alinear primero? Porque al bajarla la arista se queda en esa misma cara, solo que abajo. Si arriba ya casaba, abajo casará: cae perfecta. Si bajas sin mirar, caerá con los colores cruzados y tendrás que repetirlo.",
+        "¿Y por qué se baja con un giro DOBLE de la cara (180°) y no uno simple? Porque medio giro mantiene la arista en su misma cara, llevándola en línea recta de arriba abajo, sin volcarla a otra cara y sin tocar las aristas vecinas (que están en otras caras). Por eso puedes colocar las cuatro sin que se estorben entre sí. Cuando entiendes esto, ya no «aplicas F2»: sabes que estás bajando esa arista por su columna.",
+      ],
       cases: [
         {
-          name: "1 · Monta la margarita",
-          note: "Centro amarillo arriba y cuatro pétalos blancos alrededor (las aristas con blanco, sin importar su otro color). Ve subiéndolas a la cara de arriba moviendo las caras laterales hasta tener los cuatro pétalos.",
+          name: "1 · Reúne las aristas: la margarita",
+          note: "Sube las cuatro aristas con blanco a la cara de arriba, alrededor del amarillo, con el blanco mirando al cielo. No te fijes aún en el otro color: aquí solo las juntas. Quedan como los pétalos de una flor.",
           cube: { alg: "F2 R2 B2 L2", labels: true, highlight: ["U:0,1", "U:1,0", "U:1,2", "U:2,1"] },
         },
         {
-          name: "2 · Alinea y baja cada pétalo",
-          alg: "F2  (giro doble de la cara de delante)",
-          note: "Coge un pétalo y gira SOLO la cara de arriba hasta que su color de delante coincida con el centro de delante (aquí, verde con verde). Cuando casan, baja la cara dos veces (F2): la arista cae a la cruz, abajo, perfectamente colocada. Repite con los cuatro pétalos.",
+          name: "2 · Alinea cada pétalo y bájalo",
+          alg: "F2  ·  doble giro de la cara, una vez alineado",
+          note: "Gira SOLO la cara de arriba hasta que el segundo color del pétalo case con su centro (aquí verde con verde). Solo entonces baja esa cara 180°: la arista cae a la cruz, en su sitio y bien orientada. Repite con los cuatro pétalos.",
           beforeAfter: {
             move: "F2",
             before: { alg: "F2 R2 B2 L2", labels: true, highlight: ["U:2,1", "F:0,1"] },
             after: { alg: "F2 R2 B2 L2 F2", labels: true, highlight: ["F:2,1"] },
           },
         },
+        {
+          name: "3 · Si una arista está atrapada en el medio",
+          alg: "un giro de esa cara la expulsa arriba",
+          note: "A veces una arista blanca se queda metida en la franja del medio (aquí, blanco mirando al frente). No la dejes: gira esa cara una vez para sacarla a la capa de arriba y trátala como un pétalo más. Lo mismo si está abajo pero girada: súbela y vuelve a colocarla mirando el color.",
+          cube: { alg: "F' U' R U", labels: true, highlight: ["F:1,2", "R:1,0"] },
+        },
       ],
       done: {
         name: "Cruz blanca terminada",
-        note: "Debajo tienes una cruz blanca y, alrededor, la primera fila de cada color casa con su centro (verde con verde, rojo con rojo…). Si giras el cubo para mirar la base, verás la cruz blanca perfecta. Ahora, las esquinas.",
+        note: "Gira el cubo y mira la cara blanca: una cruz blanca con cada brazo casando su color lateral con el centro de al lado. Esa comprobación —que los colores casan— es la prueba de que está bien hecha, no solo de que «hay cruz».",
       },
     },
     {
       id: "esquinas-blancas", title: "Las esquinas blancas",
-      goal: "Rellenar las cuatro esquinas que faltan de la cara blanca. Cada esquina tiene blanco más otros dos colores, y va al único rincón de abajo donde esos dos colores coinciden con los centros vecinos.",
-      why: "Busca una esquina que tenga blanco y que esté en la capa de ARRIBA. Gírala (moviendo solo la cara de arriba) hasta dejarla justo encima del rincón de abajo al que pertenece —el rincón entre sus dos colores—. Ahora baja y sube ese rincón repitiendo un gesto sencillo: «abre, gira arriba, cierra» (R U R' U' por ese lado). Cada repetición asoma la esquina y la vuelve a guardar; en una, tres o cinco vueltas, la esquina cae con el blanco hacia abajo y encajada. No hay que reconocer nada: repites hasta que el blanco quede abajo. Si una esquina blanca está atrapada abajo pero girada o en el rincón equivocado, haz el gesto una vez para expulsarla arriba y vuelve a colocarla.",
+      goal: "Rellenar las cuatro esquinas de la cara blanca. Cada esquina lleva blanco y otros dos colores, y va al único rincón donde esos dos colores coinciden con los centros vecinos. Aquí razonar es leer hacia dónde mira el blanco.",
+      whyLabel: "Cómo razonarlas paso a paso",
+      why: [
+        "Localiza una esquina con blanco que esté en la capa de ARRIBA. Mira sus otros dos colores: te dicen su rincón (la blanco-verde-roja va al rincón entre las caras verde y roja). Gira solo la cara de arriba hasta dejarla justo ENCIMA de ese rincón. Ya está medio hecho: está sobre su sitio, solo falta meterla bien.",
+        "Ahora lo que de verdad importa: lee hacia dónde mira el blanco. Solo hay tres posibilidades y cada una pide una respuesta distinta. Si el blanco mira a la cara de la DERECHA, el gesto es R U R'. Si mira a la del FRENTE, su espejo: F' U' F. ¿Qué hacen? Abren un hueco bajando esa columna, meten la esquina por arriba y vuelven a cerrar; como el blanco entra de cara hacia abajo, la esquina queda encajada con el blanco en su sitio. No es una fórmula mágica: es «abrir, meter, cerrar».",
+        "¿Y si el blanco mira hacia ARRIBA? Es el caso incómodo: no puede entrar de cara. Primero lo tumbas —haz una vez R U R' (o F' U' F)— y verás que la esquina sale a un lado con el blanco ya mirando de costado; entonces reconoces el caso anterior y la metes. Si una esquina blanca está atrapada abajo en el rincón equivocado o girada, haz el gesto una vez para expulsarla arriba y vuelve a colocarla. Siempre la misma lógica: mira, decide, mete.",
+      ],
       cases: [
         {
-          name: "Coloca la esquina sobre su hueco", alg: "R U R' U'  (repite hasta que entre)",
-          note: "La esquina blanca está arriba, encima de su rincón (sus colores de lado, verde y rojo, casan con esas caras). Repite el gesto «abre, gira arriba, cierra» por el lado derecho hasta que el blanco baje. La flecha marca el rincón de destino.",
-          cube: { alg: "R U' R'", labels: true, highlight: ["U:2,2", "F:0,2", "R:0,0"], arrows: [{ from: "U:2,2", to: "F:2,2" }] },
+          name: "Blanco mirando a la derecha", alg: "R U R'",
+          note: "La esquina está arriba, sobre su rincón, con el blanco hacia la cara derecha. «Abre, gira, cierra» por la derecha (R U R') y entra de una. Verde y rojo casan con sus caras y el blanco baja.",
+          cube: { alg: "R U' R'", labels: true, highlight: ["U:2,2", "F:0,2", "R:0,0"], arrows: [{ from: "R:0,0", to: "R:2,0" }] },
+        },
+        {
+          name: "Blanco mirando al frente", alg: "F' U' F",
+          note: "El mismo caso en espejo: el blanco mira hacia ti (la cara de delante). Se mete con F' U' F, que es R U R' visto desde el otro lado. Si entiendes uno, entiendes los dos.",
+          cube: { alg: "F' U F", labels: true, highlight: ["U:2,2", "F:0,2", "R:0,0"], arrows: [{ from: "F:0,2", to: "F:2,2" }] },
+        },
+        {
+          name: "Blanco mirando arriba", alg: "R U R'  →  y otra vez",
+          note: "El blanco apunta al cielo y no puede entrar de cara (fíjate: sus lados, rojo y verde, están cruzados respecto a sus caras). Haz R U R' una vez: la esquina sale de lado con el blanco ya de costado. Ahora reconoce el caso (derecha o frente) y métela. Dos pasadas, pero razonadas.",
+          cube: { alg: "R2 U", labels: true, highlight: ["U:2,2", "F:0,2", "R:0,0"] },
         },
       ],
       done: {
         name: "¡Primera capa terminada!",
-        note: "Cara blanca completa abajo y la primera fila de cada color casando alrededor. La base está lista. Lo que queda —la franja del medio y la capa amarilla— está todo arriba, donde se ve. A por la Capa 2.",
+        note: "Cara blanca completa abajo y la primera fila de cada color casando todo alrededor. Fíjate en que cada esquina tiene sus tres colores bien puestos. La base está hecha; lo que queda está todo arriba, a la vista. Vamos con la Capa 2.",
         cube: { alg: "F' U' F U R U R' U'", labels: true },
       },
     },

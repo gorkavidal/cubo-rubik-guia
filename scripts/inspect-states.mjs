@@ -1,49 +1,42 @@
-// Inspecciona y verifica los estados de los diagramas. Ejecutar: node scripts/inspect-states.mjs
-import { stateAfter, faceColors, invertAlg } from "../src/lib/cubeEngine.js";
+// Analiza el comportamiento real de los gestos para poder ENSEÑARLOS con precisión.
+// Ejecutar: node scripts/inspect-states.mjs
+import { solved, applyAlg, stateAfter, faceColors, invertAlg } from "../src/lib/cubeEngine.js";
 
 const grid = (st, f) => faceColors(st, f).map((r) => r.join("")).join("/");
 const show = (label, alg) => {
   const st = stateAfter(alg);
-  console.log(`\n== ${label}   [${alg || "resuelto"}]`);
-  console.log("  U:", grid(st, "U"), " F:", grid(st, "F"), " R:", grid(st, "R"));
+  console.log(`\n== ${label}  [${alg || "resuelto"}]`);
+  console.log("   U:", grid(st, "U"), " F:", grid(st, "F"), " R:", grid(st, "R"), " D:", grid(st, "D"));
 };
-const cell = (alg, f, r, c) => faceColors(stateAfter(alg), f)[r][c];
-let ok = 0, bad = 0;
-const expect = (alg, f, r, c, val) => {
-  const got = cell(alg, f, r, c);
-  if (got === val) ok++; else { bad++; console.log(`  ✗ ${alg} ${f}[${r}][${c}] = ${got}, esperaba ${val}`); }
-};
+const eq = (a, b) => a.every((sk, i) => sk.c === b[i].c && sk.p.join() === b[i].p.join() && sk.n.join() === b[i].n.join());
+const solves = (caseAlg, gesto) => { const st = stateAfter(caseAlg); applyAlg(st, gesto); return eq(st, solved()); };
 
-console.log("######## CAPA 1 · MARGARITA (amarillo arriba) ########");
-const MARG = "F2 R2 B2 L2";
-show("Margarita", MARG);
-// centro amarillo + 4 pétalos blancos + pétalo frontal verde casando con centro
-expect(MARG, "U", 1, 1, "Y");           // centro arriba amarillo
-expect(MARG, "U", 0, 1, "W");           // pétalo atrás
-expect(MARG, "U", 1, 0, "W");           // pétalo izquierda
-expect(MARG, "U", 1, 2, "W");           // pétalo derecha
-expect(MARG, "U", 2, 1, "W");           // pétalo frente
-expect(MARG, "F", 1, 1, "G");           // centro frontal verde
-expect(MARG, "F", 0, 1, "G");           // cara frontal del pétalo frente = verde (alineado)
-
-show("Bajar pétalo frontal · DESPUÉS (F2)", "F2 R2 B2 L2 F2");
-// tras bajar, la arista blanco-verde queda abajo-frente: F[2][1] = verde casando
-expect("F2 R2 B2 L2 F2", "F", 2, 1, "G");
-expect("F2 R2 B2 L2 F2", "U", 2, 1, "Y"); // arriba-frente vuelve a amarillo
-
-console.log("\n######## CAPA 1 · ESQUINAS (amarillo arriba, cruz hecha) ########");
-// Estado con la cruz blanca hecha y una esquina blanca arriba, sobre su hueco frontal-derecho.
-// Lo genero sacando la esquina blanco-verde-rojo a la capa de arriba con el inverso de su inserción.
-for (const alg of ["R U R' U'", "R U' R'", "F' U' F", "F' U F", "R U2 R'"]) {
-  show("esquina sacada", alg);
+console.log("######## ESQUINA blanco-verde-rojo en U-F-R, según a dónde mira el BLANCO ########");
+// Genero las 3 orientaciones partiendo de resuelto (la esquina vive en D-F-R) y subiéndola.
+// Caso = inverso del gesto que la inserta. Pruebo gestos cortos y veo cuál resuelve cada uno.
+const gestos = ["R U R'", "R U' R'", "F' U' F", "F' U F", "U R U' R'", "U' F' U F", "R U2 R'", "R U R' U'", "R U R' U' R U R'"];
+for (const g of ["R U' R'", "F' U F", "R U2 R'"]) {
+  const st = stateAfter(g);
+  const wF = faceColors(st, "F")[0][2], wR = faceColors(st, "R")[0][0], wU = faceColors(st, "U")[2][2];
+  console.log(`\n-- caso [${g}]  esquina U-F-R → U:${wU} F:${wF} R:${wR}  (¿dónde mira el blanco?)`);
+  for (const ges of gestos) if (solves(g, ges)) console.log(`     se RESUELVE con:  ${ges}`);
 }
-// Inserción de esquina por la derecha: estado caso = inverso
-const INS = "U R U' R'"; // mete la esquina frontal-derecha cuando el blanco mira a la derecha
-show("Esquina · estado caso (a reconocer)", invertAlg(INS));
-console.log("  cara D (primera capa) toda blanca:", faceColors(stateAfter(invertAlg(INS)), "D").flat().every((c) => c === "W"));
 
-console.log("\n######## CAPA 1 · objetivo (primera capa hecha, resto pendiente) ########");
-show("Primera capa hecha", invertAlg("R U R' U R U2 R'"));
-console.log("  D toda blanca:", faceColors(stateAfter(invertAlg("R U R' U R U2 R'")), "D").flat().every((c) => c === "W"));
+console.log("\n\n######## ARISTA blanca atrapada en la FRANJA DEL MEDIO ########");
+// La saco de su sitio (abajo) a la franja media para mostrar el caso.
+for (const a of ["F' U' R U", "R U' R'", "F U F'", "L' U L U"]) {
+  const st = stateAfter(a);
+  const F = faceColors(st, "F"), R = faceColors(st, "R");
+  const med = [];
+  if (F[1][0] === "W") med.push("F:1,0"); if (F[1][2] === "W") med.push("F:1,2");
+  if (R[1][0] === "W") med.push("R:1,0"); if (R[1][2] === "W") med.push("R:1,2");
+  show(`arista; blanco en franja media: ${med.join(" ") || "(no)"}`, a);
+}
 
-console.log(`\nComprobaciones: ${ok} OK, ${bad} fallos.`);
+console.log("\n######## ARISTA blanca mal ORIENTADA en su sitio (blanco al lado) ########");
+// Cruz hecha pero una arista volteada: blanco mirando al frente en vez de abajo.
+show("ejemplo volteada", "F U' R U");
+
+console.log("\n######## Comprobación: la margarita y el bajar pétalo (ya en uso) ########");
+show("margarita", "F2 R2 B2 L2");
+show("tras bajar el pétalo de delante", "F2 R2 B2 L2 F2");
