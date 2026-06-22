@@ -64,3 +64,62 @@ export function visibleBBox(inset = 0.86) {
   }
   return { minX, minY, maxX, maxY };
 }
+
+/* ---------------------------------------------------------------------------
+   ANIMACIÓN: geometría por sticker desde (p, n) y rotación por ángulo libre.
+   --------------------------------------------------------------------------- */
+
+// Rotación 3D por ángulo t (rad) alrededor de un eje. Coincide con el motor:
+// a t = sign·90° reproduce exactamente rot(v, axis, sign).
+export function rotateAngle([x, y, z], axis, t) {
+  const c = Math.cos(t), s = Math.sin(t);
+  if (axis === "x") return [x, y * c - z * s, y * s + z * c];
+  if (axis === "y") return [x * c + z * s, y, -x * s + z * c];
+  return [x * c - y * s, x * s + y * c, z];
+}
+
+const axisIndex = (n) => (n[0] !== 0 ? 0 : n[1] !== 0 ? 1 : 2);
+
+// Centro 3D del sticker: el cubie p, llevado a la superficie del cubo (±1.5) en su normal.
+export function stickerCenter3d(p, n) {
+  const c = [p[0], p[1], p[2]];
+  const ax = axisIndex(n);
+  c[ax] = 1.5 * n[ax];
+  return c;
+}
+
+// Cuatro esquinas 3D del sticker (en el plano de su cara), con separación `inset`.
+export function stickerCorners3d(p, n, inset = 0.86) {
+  const center = stickerCenter3d(p, n);
+  const ax = axisIndex(n);
+  const e = [];
+  for (let i = 0; i < 3; i++) if (i !== ax) { const v = [0, 0, 0]; v[i] = 0.5 * inset; e.push(v); }
+  const [a, b] = e;
+  return [
+    [center[0] + a[0] + b[0], center[1] + a[1] + b[1], center[2] + a[2] + b[2]],
+    [center[0] - a[0] + b[0], center[1] - a[1] + b[1], center[2] - a[2] + b[2]],
+    [center[0] - a[0] - b[0], center[1] - a[1] - b[1], center[2] - a[2] - b[2]],
+    [center[0] + a[0] - b[0], center[1] + a[1] - b[1], center[2] + a[2] - b[2]],
+  ];
+}
+
+// Visible si la cara mira hacia la cámara isométrica (dirección +x+y+z).
+export function isVisible(n) {
+  return n[0] + n[1] + n[2] > 0.0001;
+}
+
+// Profundidad hacia la cámara (mayor = más cerca; se pinta encima).
+export function depth(c) {
+  return c[0] + c[1] + c[2];
+}
+
+// viewBox fijo que contiene el cubo entero (8 esquinas) con margen — estable durante la animación.
+export function fullCubeBBox(margin = 16) {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const x of [-1.5, 1.5]) for (const y of [-1.5, 1.5]) for (const z of [-1.5, 1.5]) {
+    const [px, py] = project([x, y, z]);
+    if (px < minX) minX = px; if (px > maxX) maxX = px;
+    if (py < minY) minY = py; if (py > maxY) maxY = py;
+  }
+  return { x: minX - margin, y: minY - margin, w: maxX - minX + margin * 2, h: maxY - minY + margin * 2 };
+}

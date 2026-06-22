@@ -50,7 +50,9 @@ export const WIDE = {
 };
 export const ROT = { x: { axis: "x", sign: -1 }, y: { axis: "y", sign: -1 }, z: { axis: "z", sign: -1 } };
 
-export function doToken(st, tok) {
+// Devuelve qué capa(s) rota un token, en qué sentido y cuántos cuartos de vuelta.
+// { axis, coords, sign (ya combinado con el ' ), times }.
+export function parseToken(tok) {
   const base = tok[0]; const rest = tok.slice(1);
   let times = 1, sgn = 1;
   if (rest.includes("2")) times = 2;
@@ -61,7 +63,17 @@ export function doToken(st, tok) {
   else if (WIDE[base]) { axis = WIDE[base].axis; coords = WIDE[base].coords; sign = WIDE[base].sign; }
   else if (ROT[base]) { axis = ROT[base].axis; coords = [-1, 0, 1]; sign = ROT[base].sign; }
   else throw new Error("bad token " + tok);
-  for (let t = 0; t < times; t++) layerMove(st, axis, coords, sign * sgn);
+  return { axis, coords, sign: sign * sgn, times };
+}
+
+export function doToken(st, tok) {
+  const { axis, coords, sign, times } = parseToken(tok);
+  for (let t = 0; t < times; t++) layerMove(st, axis, coords, sign);
+}
+
+// Lista de tokens de un algoritmo (para animar paso a paso).
+export function tokens(alg) {
+  return alg.replace(/[()\[\]]/g, " ").trim().split(/\s+/).filter(Boolean).map((t) => t.replace("2'", "2").replace("'2", "2"));
 }
 
 export function applyAlg(st, alg) {

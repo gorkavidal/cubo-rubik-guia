@@ -46,12 +46,8 @@ export const LAYER1 = {
         {
           name: "2 · Alinea cada pétalo y bájalo",
           alg: "F2  ·  doble giro de la cara, una vez alineado",
-          note: "Gira SOLO la cara de arriba hasta que el segundo color del pétalo case con su centro (aquí verde con verde). Solo entonces baja esa cara 180°: la arista cae a la cruz, en su sitio y bien orientada. Repite con los cuatro pétalos.",
-          beforeAfter: {
-            move: "F2",
-            before: { alg: "F2 R2 B2 L2", labels: true, highlight: ["U:2,1", "F:0,1"] },
-            after: { alg: "F2 R2 B2 L2 F2", labels: true, highlight: ["F:2,1"] },
-          },
+          note: "Gira SOLO la cara de arriba hasta que el segundo color del pétalo case con su centro (aquí verde con verde). Solo entonces baja esa cara 180° (F2): la arista cae en línea recta a la cruz, en su sitio y bien orientada. Mira cómo baja sin tocar los demás pétalos. Repite con los cuatro.",
+          anim: { setup: "F2 R2 B2 L2", moves: "F2", labels: true, ms: 600 },
         },
         {
           name: "3 · Si una arista está atrapada en el medio",
@@ -72,23 +68,23 @@ export const LAYER1 = {
       why: [
         "Localiza una esquina con blanco que esté en la capa de ARRIBA. Mira sus otros dos colores: te dicen su rincón (la blanco-verde-roja va al rincón entre las caras verde y roja). Gira solo la cara de arriba hasta dejarla justo ENCIMA de ese rincón. Ya está medio hecho: está sobre su sitio, solo falta meterla bien.",
         "Ahora lo que de verdad importa: lee hacia dónde mira el blanco. Solo hay tres posibilidades y cada una pide una respuesta distinta. Si el blanco mira a la cara de la DERECHA, el gesto es R U R'. Si mira a la del FRENTE, su espejo: F' U' F. ¿Qué hacen? Abren un hueco bajando esa columna, meten la esquina por arriba y vuelven a cerrar; como el blanco entra de cara hacia abajo, la esquina queda encajada con el blanco en su sitio. No es una fórmula mágica: es «abrir, meter, cerrar».",
-        "¿Y si el blanco mira hacia ARRIBA? Es el caso incómodo: no puede entrar de cara. Primero lo tumbas —haz una vez R U R' (o F' U' F)— y verás que la esquina sale a un lado con el blanco ya mirando de costado; entonces reconoces el caso anterior y la metes. Si una esquina blanca está atrapada abajo en el rincón equivocado o girada, haz el gesto una vez para expulsarla arriba y vuelve a colocarla. Siempre la misma lógica: mira, decide, mete.",
+        "¿Y si el blanco mira hacia ARRIBA? Es el caso pesado: no puede entrar de cara, hay que reorientarlo primero. La forma limpia es R U' R' U2 R U R', que no es magia sino tres tiempos encadenados: R U' R' tumba el blanco para que deje de mirar arriba, U2 recoloca la esquina sobre su hueco (el blanco queda mirando a la derecha) y R U R' la mete como el primer caso. En el fondo es «preparar el caso fácil y aplicarlo». Y si una esquina blanca está atrapada abajo en el rincón equivocado o girada, haz un gesto para sacarla arriba y vuelve a colocarla. Siempre la misma lógica: mira, decide, mete.",
       ],
       cases: [
         {
           name: "Blanco mirando a la derecha", alg: "R U R'",
-          note: "La esquina está arriba, sobre su rincón, con el blanco hacia la cara derecha. «Abre, gira, cierra» por la derecha (R U R') y entra de una. Verde y rojo casan con sus caras y el blanco baja.",
-          cube: { alg: "R U' R'", labels: true, highlight: ["U:2,2", "F:0,2", "R:0,0"], arrows: [{ from: "R:0,0", to: "R:2,0" }] },
+          note: "La esquina está arriba, sobre su rincón, con el blanco hacia la cara derecha. «Abre, gira, cierra» por la derecha (R U R') y entra de una. Mira la animación: la columna derecha se abre, la esquina entra y se cierra con el blanco abajo.",
+          anim: { setup: "R U' R'", moves: "R U R'", labels: true },
         },
         {
           name: "Blanco mirando al frente", alg: "F' U' F",
           note: "El mismo caso en espejo: el blanco mira hacia ti (la cara de delante). Se mete con F' U' F, que es R U R' visto desde el otro lado. Si entiendes uno, entiendes los dos.",
-          cube: { alg: "F' U F", labels: true, highlight: ["U:2,2", "F:0,2", "R:0,0"], arrows: [{ from: "F:0,2", to: "F:2,2" }] },
+          anim: { setup: "F' U F", moves: "F' U' F", labels: true },
         },
         {
-          name: "Blanco mirando arriba", alg: "R U R'  →  y otra vez",
-          note: "El blanco apunta al cielo y no puede entrar de cara (fíjate: sus lados, rojo y verde, están cruzados respecto a sus caras). Haz R U R' una vez: la esquina sale de lado con el blanco ya de costado. Ahora reconoce el caso (derecha o frente) y métela. Dos pasadas, pero razonadas.",
-          cube: { alg: "R2 U", labels: true, highlight: ["U:2,2", "F:0,2", "R:0,0"] },
+          name: "Blanco mirando arriba", alg: "R U' R' U2 R U R'",
+          note: "El caso pesado: el blanco apunta al cielo y no entra de cara. La secuencia lo resuelve en tres tiempos —síguelos en la animación—: «R U' R'» TUMBA el blanco (deja de mirar arriba), «U2» RECOLOCA la esquina sobre su hueco con el blanco hacia la derecha, y «R U R'» la METE. Es, literalmente, preparar el caso fácil y aplicarlo.",
+          anim: { setup: "R U' R' U2 R U R'", moves: "R U' R' U2 R U R'", labels: true, ms: 480 },
         },
       ],
       done: {

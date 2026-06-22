@@ -6,7 +6,7 @@ Lo que la hace distinta: **todos los diagramas son estados reales de un cubo**, 
 
 ## Contenido
 
-- **Capa 1 · La cara blanca** — cruz blanca y esquinas, a mano, casando colores con los centros. Con cubo en perspectiva.
+- **Capa 1 · La cara blanca** — enseñada de forma razonada: primero a *leer* el cubo (centros, piezas, posición vs orientación), luego la cruz por el método de la margarita y las esquinas según hacia dónde mira el blanco. Con **cubos animados** que muestran cada gesto en movimiento.
 - **Capa 2 · La franja del medio** — las 4 aristas del medio con los dos algoritmos espejo (derecha / izquierda).
 - **Capa 3 · La última capa (amarilla)** — tres caminos:
   - **Simplificada** — pocos algoritmos muy repetibles (con dos variantes en la cruz).
