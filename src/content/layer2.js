@@ -25,13 +25,13 @@ export const LAYER2 = {
       cases: [
         {
           name: "Insertar a la DERECHA", alg: RIGHT,
-          note: "La arista de arriba muestra su color frontal igual al centro del frente (verde con verde) y, mirando al cielo, el color de la cara derecha (rojo). Baja a la derecha. La flecha señala el hueco de destino.",
-          cube: { alg: invertAlg(RIGHT), labels: true, highlight: ["U:2,1", "F:0,1"], arrows: [{ from: "U:2,1", to: "F:1,2" }] },
+          note: "La arista de arriba muestra su color frontal igual al centro del frente (verde con verde) y, mirando al cielo, el color de la cara derecha (rojo). Baja a la derecha. Dale al play para ver cómo se abre el hueco, entra la arista y se cierra.",
+          anim: { setup: invertAlg(RIGHT), moves: RIGHT, labels: true },
         },
         {
           name: "Insertar a la IZQUIERDA", alg: LEFT,
           note: "Mismo planteamiento en espejo: frontal casando con el centro (verde con verde) y arriba el color de la cara izquierda (naranja). Baja a la izquierda. Es el mismo algoritmo cambiando derecha por izquierda.",
-          cube: { alg: invertAlg(LEFT), labels: true, highlight: ["U:2,1", "F:0,1"], arrows: [{ from: "U:2,1", to: "F:1,0" }] },
+          anim: { setup: invertAlg(LEFT), moves: LEFT, labels: true },
         },
         {
           name: "Arista atrapada (sácala primero)", alg: "U R U' R' U' F' U F",

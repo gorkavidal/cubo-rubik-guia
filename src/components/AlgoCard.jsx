@@ -3,22 +3,39 @@ import Diagram from "./Diagram.jsx";
 import CubeView from "./CubeView.jsx";
 import BeforeAfter from "./BeforeAfter.jsx";
 import CubeAnimation from "./CubeAnimation.jsx";
+import { invertAlg, tokens, parseToken } from "../lib/cubeEngine.js";
 import { T, FONT_DISPLAY, FONT_BODY, FONT_MONO } from "../lib/theme.js";
 
+// Devuelve `alg` si es una secuencia de movimientos pura (parseable); si no, null.
+function pureAlg(alg) {
+  if (!alg) return null;
+  try { const t = tokens(alg); if (!t.length) return null; t.forEach(parseToken); return alg; }
+  catch { return null; }
+}
+
 /* Tarjeta de un caso/algoritmo.
-   Visual: c.anim → cubo animado; c.beforeAfter → dos cubos; c.cube → cubo en
-           perspectiva; c.dia → diagrama de planta (última capa).
-   Texto: name, alg (notación), note, y opcional trace (cómo se mueve cada pieza). */
+   Visual: c.anim → cubo animado explícito; c.beforeAfter → dos cubos; c.cube →
+   cubo en perspectiva; c.dia → diagrama de planta (última capa). Para los casos
+   de última capa con algoritmo puro se añade además un cubo animado, derivado
+   del mismo estado que el diagrama (setup = inverso del algoritmo). */
 export default function AlgoCard({ c, big }) {
-  const visual = c.anim
-    ? <CubeAnimation {...c.anim} size={big ? 180 : 160} />
-    : c.beforeAfter
-      ? <BeforeAfter {...c.beforeAfter} size={big ? 130 : 116} />
-      : c.cube
-        ? <CubeView {...c.cube} size={big ? 184 : 150} />
-        : c.dia
-          ? <Diagram spec={c.dia} size={big ? 132 : 104} />
-          : null;
+  // Animación: explícita, o derivada del diagrama de planta (no manual) del caso.
+  let anim = c.anim;
+  if (!anim && c.dia && !c.dia.manual && pureAlg(c.dia.alg)) {
+    anim = { setup: invertAlg(c.dia.alg), moves: c.dia.alg, ms: 340 };
+  }
+
+  let visual;
+  if (c.beforeAfter) visual = <BeforeAfter {...c.beforeAfter} size={big ? 130 : 116} />;
+  else if (c.cube) visual = <CubeView {...c.cube} size={big ? 184 : 150} />;
+  else if (c.dia || anim) {
+    visual = (
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+        {c.dia && <Diagram spec={c.dia} size={big ? 120 : 104} />}
+        {anim && <CubeAnimation {...anim} size={big ? 168 : 150} />}
+      </div>
+    );
+  } else visual = null;
 
   return (
     <div style={{ background: T.panel2, border: "1px solid " + T.line, borderRadius: 12, padding: 14, display: "flex", gap: 14, alignItems: "flex-start", flexWrap: "wrap" }}>
