@@ -1,17 +1,21 @@
 import React from "react";
 import Diagram from "./Diagram.jsx";
 import CubeView from "./CubeView.jsx";
+import BeforeAfter from "./BeforeAfter.jsx";
 import { T, FONT_DISPLAY, FONT_BODY, FONT_MONO } from "../lib/theme.js";
 
 /* Tarjeta de un caso/algoritmo.
-   Visual: c.dia → diagrama de planta (última capa); c.cube → cubo en perspectiva.
+   Visual: c.beforeAfter → dos cubos (antes→después); c.cube → cubo en perspectiva;
+           c.dia → diagrama de planta (última capa).
    Texto: name, alg (notación), note, y opcional trace (cómo se mueve cada pieza). */
 export default function AlgoCard({ c, big }) {
-  const visual = c.cube
-    ? <CubeView {...c.cube} size={big ? 184 : 150} />
-    : c.dia
-      ? <Diagram spec={c.dia} size={big ? 132 : 104} />
-      : null;
+  const visual = c.beforeAfter
+    ? <BeforeAfter {...c.beforeAfter} size={big ? 130 : 116} />
+    : c.cube
+      ? <CubeView {...c.cube} size={big ? 184 : 150} />
+      : c.dia
+        ? <Diagram spec={c.dia} size={big ? 132 : 104} />
+        : null;
 
   return (
     <div style={{ background: T.panel2, border: "1px solid " + T.line, borderRadius: 12, padding: 14, display: "flex", gap: 14, alignItems: "flex-start", flexWrap: "wrap" }}>

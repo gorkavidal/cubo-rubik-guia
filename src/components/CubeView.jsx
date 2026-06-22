@@ -19,7 +19,7 @@ import { T } from "../lib/theme.js";
      labels     bool       — rotula ARRIBA / FRENTE / DERECHA
    =========================================================================== */
 
-const FACE_SHADE = { U: 1.0, F: 0.9, R: 0.78 }; // sensación de volumen
+const FACE_SHADE = { U: 1.0, F: 0.93, R: 0.85 }; // leve sombreado de volumen, sin apagar los colores (p.ej. el blanco)
 const INSET = 0.86;
 
 // Oscurece un color hex mezclándolo con negro (factor 1 = igual, 0.8 = 20% más oscuro).

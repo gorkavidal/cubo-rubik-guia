@@ -1,57 +1,49 @@
-// Inspecciona los estados que mostrarán los diagramas de capas 1 y 2.
-// Ejecutar:  node scripts/inspect-states.mjs
-import { stateAfter, faceColors, invertAlg, solved, applyAlg } from "../src/lib/cubeEngine.js";
+// Inspecciona y verifica los estados de los diagramas. Ejecutar: node scripts/inspect-states.mjs
+import { stateAfter, faceColors, invertAlg } from "../src/lib/cubeEngine.js";
 
+const grid = (st, f) => faceColors(st, f).map((r) => r.join("")).join("/");
 const show = (label, alg) => {
   const st = stateAfter(alg);
-  const U = faceColors(st, "U"), F = faceColors(st, "F"), R = faceColors(st, "R"), D = faceColors(st, "D");
-  console.log("\n==== " + label + "   (alg = " + (alg || "resuelto") + ")");
-  console.log("U:", U.map((r) => r.join("")).join(" / "));
-  console.log("F:", F.map((r) => r.join("")).join(" / "));
-  console.log("R:", R.map((r) => r.join("")).join(" / "));
-  console.log("D:", D.map((r) => r.join("")).join(" / "), "  (toda W =", D.flat().every((c) => c === "W"), ")");
+  console.log(`\n== ${label}   [${alg || "resuelto"}]`);
+  console.log("  U:", grid(st, "U"), " F:", grid(st, "F"), " R:", grid(st, "R"));
+};
+const cell = (alg, f, r, c) => faceColors(stateAfter(alg), f)[r][c];
+let ok = 0, bad = 0;
+const expect = (alg, f, r, c, val) => {
+  const got = cell(alg, f, r, c);
+  if (got === val) ok++; else { bad++; console.log(`  ✗ ${alg} ${f}[${r}][${c}] = ${got}, esperaba ${val}`); }
 };
 
-// ---- CAPA 2: aristas del medio (amarillo arriba, blanco abajo) ----
-const AR = "U R U' R' U' F' U F";   // insertar a la DERECHA
-const AL = "U' L' U L U F U' F'";   // insertar a la IZQUIERDA
-console.log("\n######## CAPA 2 ########");
-show("Inserción DERECHA · estado caso (a reconocer)", invertAlg(AR));
-show("Inserción IZQUIERDA · estado caso", invertAlg(AL));
+console.log("######## CAPA 1 · MARGARITA (amarillo arriba) ########");
+const MARG = "F2 R2 B2 L2";
+show("Margarita", MARG);
+// centro amarillo + 4 pétalos blancos + pétalo frontal verde casando con centro
+expect(MARG, "U", 1, 1, "Y");           // centro arriba amarillo
+expect(MARG, "U", 0, 1, "W");           // pétalo atrás
+expect(MARG, "U", 1, 0, "W");           // pétalo izquierda
+expect(MARG, "U", 1, 2, "W");           // pétalo derecha
+expect(MARG, "U", 2, 1, "W");           // pétalo frente
+expect(MARG, "F", 1, 1, "G");           // centro frontal verde
+expect(MARG, "F", 0, 1, "G");           // cara frontal del pétalo frente = verde (alineado)
 
-// ¿El algoritmo respeta la primera capa? El estado-caso debe tener D toda blanca.
-const okD = (alg) => stateAfter(invertAlg(alg)) && faceColors(stateAfter(invertAlg(alg)), "D").flat().every((c) => c === "W");
-console.log("\nDERECHA respeta primera capa (D toda blanca en el caso):", okD(AR));
-console.log("IZQUIERDA respeta primera capa:", okD(AL));
+show("Bajar pétalo frontal · DESPUÉS (F2)", "F2 R2 B2 L2 F2");
+// tras bajar, la arista blanco-verde queda abajo-frente: F[2][1] = verde casando
+expect("F2 R2 B2 L2 F2", "F", 2, 1, "G");
+expect("F2 R2 B2 L2 F2", "U", 2, 1, "Y"); // arriba-frente vuelve a amarillo
 
-// Y al aplicar el algoritmo desde el caso, debe quedar resuelto (arista insertada).
-const solvesFromCase = (alg) => {
-  const st = stateAfter(invertAlg(alg));
-  applyAlg(st, alg);
-  const ref = solved();
-  return st.every((sk, i) => sk.c === ref[i].c && sk.p.join() === ref[i].p.join() && sk.n.join() === ref[i].n.join());
-};
-console.log("DERECHA inserta y resuelve:", solvesFromCase(AR));
-console.log("IZQUIERDA inserta y resuelve:", solvesFromCase(AL));
-
-// ---- CAPA 1: cruz y esquinas blancas (BLANCO ARRIBA con x2) ----
-console.log("\n######## CAPA 1 (blanco arriba) ########");
-show("Base resuelta blanco arriba (objetivo capa 1)", "x2");
-
-// Candidatos para 'arista blanca a colocar' — busco una arista blanca visible en F o R.
-console.log("\n-- candidatos arista blanca (blanco visible en F o R) --");
-for (const a of ["x2 F'", "x2 F", "x2 R'", "x2 R", "x2 R U' R'", "x2 F U F'", "x2 D R' D'"]) {
-  const st = stateAfter(a);
-  const F = faceColors(st, "F"), R = faceColors(st, "R");
-  const whitesF = [], whitesR = [];
-  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
-    if (F[r][c] === "W") whitesF.push(`F:${r},${c}`);
-    if (R[r][c] === "W") whitesR.push(`R:${r},${c}`);
-  }
-  console.log(a.padEnd(12), "blancos →", [...whitesF, ...whitesR].join(" ") || "(ninguno visible)");
+console.log("\n######## CAPA 1 · ESQUINAS (amarillo arriba, cruz hecha) ########");
+// Estado con la cruz blanca hecha y una esquina blanca arriba, sobre su hueco frontal-derecho.
+// Lo genero sacando la esquina blanco-verde-rojo a la capa de arriba con el inverso de su inserción.
+for (const alg of ["R U R' U'", "R U' R'", "F' U' F", "F' U F", "R U2 R'"]) {
+  show("esquina sacada", alg);
 }
+// Inserción de esquina por la derecha: estado caso = inverso
+const INS = "U R U' R'"; // mete la esquina frontal-derecha cuando el blanco mira a la derecha
+show("Esquina · estado caso (a reconocer)", invertAlg(INS));
+console.log("  cara D (primera capa) toda blanca:", faceColors(stateAfter(invertAlg(INS)), "D").flat().every((c) => c === "W"));
 
-// Candidatos para 'esquina blanca a encajar' con el truco R U R' U'.
-console.log("\n-- candidatos esquina blanca --");
-show("Esquina sacada a la base (x2 R U R')", "x2 R U R'");
-show("Objetivo capa 2 · F2L + cruz amarilla pendiente", invertAlg("R U R' U R U2 R'"));
+console.log("\n######## CAPA 1 · objetivo (primera capa hecha, resto pendiente) ########");
+show("Primera capa hecha", invertAlg("R U R' U R U2 R'"));
+console.log("  D toda blanca:", faceColors(stateAfter(invertAlg("R U R' U R U2 R'")), "D").flat().every((c) => c === "W"));
+
+console.log(`\nComprobaciones: ${ok} OK, ${bad} fallos.`);

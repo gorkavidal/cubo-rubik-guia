@@ -13,9 +13,9 @@ export function HowToReadCube() {
   return (
     <Collapsible title="Cómo leer el cubo en perspectiva" open>
       <div style={{ display: "flex", gap: 20, flexWrap: "wrap", alignItems: "center" }}>
-        <CubeView alg="x2" size={150} labels dim highlight={["U:2,2", "F:0,2", "R:0,0"]} arrows={[{ from: "R:2,0", to: "R:0,0" }]} />
+        <CubeView alg="R U' R'" size={150} labels highlight={["U:2,2", "F:0,2", "R:0,0"]} arrows={[{ from: "U:2,2", to: "F:2,2" }]} />
         <p style={{ flex: "1 1 280px", fontFamily: FONT_BODY, fontSize: 13, color: T.muted, lineHeight: 1.6, margin: 0 }}>
-          En las dos primeras capas vemos el cubo en perspectiva, con sus tres caras visibles: <span style={{ color: T.text }}>arriba</span>, <span style={{ color: T.text }}>frente</span> y <span style={{ color: T.text }}>derecha</span>. El <span style={{ color: T.accent, fontWeight: 600 }}>anillo amarillo</span> marca la pieza de la que estamos hablando; la <span style={{ color: T.text, fontWeight: 600 }}>flecha</span> indica su recorrido hasta el sitio correcto. Los colores son un ejemplo: en tu cubo, lo que manda es casar cada pieza con el <em>centro</em> de su cara.
+          En las dos primeras capas vemos el cubo en perspectiva, con sus tres caras visibles: <span style={{ color: T.text }}>arriba</span>, <span style={{ color: T.text }}>frente</span> y <span style={{ color: T.text }}>derecha</span>. Lo sostienes siempre con el <span style={{ color: T.accent, fontWeight: 600 }}>amarillo arriba</span>. El <span style={{ color: T.accent, fontWeight: 600 }}>anillo amarillo</span> marca la pieza de la que hablamos y la <span style={{ color: T.text, fontWeight: 600 }}>flecha</span> su recorrido. Los colores son un ejemplo: en tu cubo, lo que manda es casar cada pieza con el <em>centro</em> de su cara.
         </p>
       </div>
     </Collapsible>
