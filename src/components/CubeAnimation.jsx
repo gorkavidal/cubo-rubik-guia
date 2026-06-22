@@ -33,9 +33,8 @@ const ptsAttr = (pts) => pts.map((q) => q[0].toFixed(2) + "," + q[1].toFixed(2))
 
 export default function CubeAnimation({ setup = "", moves = "", size = 168, ms = 430, labels = false }) {
   const list = tokens(moves);
-  const [playing, setPlaying] = useState(() =>
-    !(typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)
-  );
+  // Empieza SIEMPRE en parado, mostrando la posición inicial; el usuario pulsa ▶ para ver el gesto.
+  const [playing, setPlaying] = useState(false);
   const [, force] = useReducer((x) => x + 1, 0);
 
   // Estado de animación en refs (no provoca render por sí mismo).

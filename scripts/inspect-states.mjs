@@ -1,46 +1,46 @@
-// Caso "blanco arriba" CORRECTO y prueba del método del usuario.
-import { solved, applyAlg, stateAfter, faceColors } from "../src/lib/cubeEngine.js";
+// Verifica el método INFALIBLE "orientar de una en una" (sin reconocer casos).
+import { solved, applyAlg, invertAlg } from "../src/lib/cubeEngine.js";
 
-const S0 = solved();
-const ufr = (st) => `U:${faceColors(st, "U")[2][2]} F:${faceColors(st, "F")[0][2]} R:${faceColors(st, "R")[0][0]}`;
-const eq = (st) => st.every((sk, i) => sk.c === S0[i].c && sk.p.join() === S0[i].p.join() && sk.n.join() === S0[i].n.join());
+const clone = (st) => st.map((s) => ({ c: s.c, p: s.p.slice(), n: s.n.slice() }));
+const stk = (st, x, y, z, n) => st.find((s) => s.p[0] === x && s.p[1] === y && s.p[2] === z && s.n[0] === n[0] && s.n[1] === n[1] && s.n[2] === n[2]);
+const orientedAt = (st, x, z) => stk(st, x, 1, z, [0, 1, 0]).c === "Y";
+const CORN = [[1, 1], [-1, 1], [1, -1], [-1, -1]];
+const allOriented = (st) => CORN.every(([x, z]) => orientedAt(st, x, z));
+const fullySolved = (st) => { const r = solved(); return st.every((s, i) => s.c === r.c && s.p.join() === r.p.join() && s.n.join() === r.n.join()); };
 
-// Un sticker "puede diferir" si su cubie actual NO está en la primera capa (y>=0),
-// o si es el hueco de la esquina D-F-R (1,-1,1). Así exijo primera capa intacta salvo esa esquina.
-function firstLayerIntactExceptDFR(st) {
-  for (let i = 0; i < st.length; i++) {
-    const sk = st[i], r = S0[i];
-    const same = sk.c === r.c && sk.p.join() === r.p.join() && sk.n.join() === r.n.join();
-    if (same) continue;
-    const p = sk.p;
-    const allowed = p[1] >= 0 || (p[0] === 1 && p[1] === -1 && p[2] === 1);
-    if (!allowed) return false;
-  }
-  return true;
-}
-
-// Busca el caso blanco-arriba más corto (la esquina blanco-verde-rojo en U-F-R, blanco arriba).
-const M = ["R", "R'", "U", "U'", "F", "F'", "L", "L'", "B", "B'", "D", "D'", "R2", "U2", "F2"];
-let CASE = null;
-const rec = (seq) => {
-  if (CASE) return;
-  if (seq.length) {
-    const st = stateAfter(seq.join(" "));
-    const U = faceColors(st, "U"), F = faceColors(st, "F"), R = faceColors(st, "R");
-    const isWVR = (F[0][2] === "G" && R[0][0] === "R") || (F[0][2] === "R" && R[0][0] === "G");
-    if (U[2][2] === "W" && isWVR && firstLayerIntactExceptDFR(st)) { CASE = seq.join(" "); return; }
-  }
-  if (seq.length >= 7) return;
-  for (const m of M) { if (seq.length && m[0] === seq[seq.length - 1][0]) continue; rec([...seq, m]); }
+const OLLC = {
+  Sune: "R U R' U R U2 R'", Antisune: "R U2 R' U' R U' R'",
+  H: "R U R' U R U' R' U R U2 R'", Pi: "R U2 R2 U' R2 U' R2 U2 R",
+  T: "r U R' U' r' F R F'", U_hl: "R2 D R' U2 R D' R' U2 R'", L_bt: "F' r U R' U' r' F R",
 };
-rec([]);
-console.log("CASO blanco-arriba (1ª capa intacta salvo D-F-R):", CASE, "->", CASE && ufr(stateAfter(CASE)));
 
-if (CASE) {
-  const test = (label, alg) => { console.log(`  ${label}: "${alg}"  ->  ${eq(stateAfter(CASE + " " + alg)) ? "RESUELVE ✓" : "no"}  (${ufr(stateAfter(CASE + " " + alg))})`); };
-  console.log("\nTras solo R U' R' (¿a dónde va el blanco?):", ufr(stateAfter(CASE + " R U' R'")));
-  console.log("\nProbando interpretaciones del método 'R U' R' ... R U R'':");
-  for (const k of ["", "U", "U'", "U2"]) test(`R U' R' [${k || "·"}] R U R'`, `R U' R' ${k} R U R'`.replace(/\s+/g, " ").trim());
-  console.log("\nOtras de 2 pasos (tumbar + insertar):");
-  for (const a of ["R U2 R' U' R U R'", "R U' R' U' R U R'", "R U' R' U2 R U R'", "F' U' F U' R U R'"]) test("alg", a);
+// Método: por cada esquina sin amarillo arriba, ponla en FUR (girando U) y repite
+// R' D' R D hasta que muestre amarillo arriba. Al final, U para realinear.
+function orientOneByOne(st0) {
+  let st = clone(st0); let trick = 0, uTurns = 0;
+  for (let guard = 0; guard < 30; guard++) {
+    if (allOriented(st)) break;
+    // trae una esquina NO orientada a FUR
+    let spins = 0;
+    while (orientedAt(st, 1, 1) && spins < 4) { applyAlg(st, "U"); uTurns++; spins++; }
+    // repite el truco hasta orientar esa esquina (sin tocar U)
+    let reps = 0;
+    while (!orientedAt(st, 1, 1) && reps < 6) { applyAlg(st, "R' D' R D"); trick++; reps++; }
+  }
+  return { oriented: allOriented(st), tricks: trick };
 }
+
+console.log("Método 'de una en una' (R' D' R D), por caso:");
+let allOk = true;
+for (const [n, a] of Object.entries(OLLC)) {
+  const st = solved(); applyAlg(st, invertAlg(a));
+  const r = orientOneByOne(st);
+  if (!r.oriented) allOk = false;
+  console.log(`  ${n.padEnd(12)} -> ${r.oriented ? "TODAS amarillas ✓" : "FALLA ✗"}  (${r.tricks} repeticiones del truco)`);
+}
+console.log("\n¿Funciona para TODOS los casos?", allOk ? "SÍ ✓" : "no");
+
+// Comprobación de que 2 y 4 repeticiones giran la esquina 120/240 (sin tocar U)
+const st = solved();
+console.log("\nUna esquina de la cara amarilla, repitiendo R' D' R D (debe volver a su sitio cada 6):");
+let s2 = solved(); for (let i = 1; i <= 6; i++) { applyAlg(s2, "R' D' R D"); if (fullySolved(s2)) console.log("  vuelve a resuelto tras", i, "repeticiones"); }
