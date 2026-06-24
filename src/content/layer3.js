@@ -29,9 +29,14 @@ export const SENCILLO = {
     {
       id: "colocar-esquinas", title: "Colocar las esquinas",
       goal: "Llevar cada esquina a su rincón correcto. Aquí sólo importa la POSICIÓN, no cómo esté girada: el giro lo arreglamos en el paso siguiente.",
-      why: "U R U' L' U R' U' L cicla tres esquinas de sitio —atrás-izquierda → frente-izquierda → atrás-derecha → atrás-izquierda— y deja fija la de frente-derecha (comprobado: conserva las dos capas de abajo y no toca aristas). De paso las tuerce, pero da igual, porque las orientaremos después. Ese es el truco de dejar la orientación para el final: el algoritmo de colocar puede ser corto precisamente porque no tiene que respetar el giro.",
+      whyLabel: "Cómo colocarlas (y cómo salir del atasco)",
+      why: [
+        "U R U' L' U R' U' L cicla tres esquinas de sitio y deja fija la de frente-derecha (no toca las dos capas de abajo ni las aristas). De paso las tuerce, pero da igual: el giro lo arreglamos en el paso siguiente. Por eso este algoritmo puede ser corto, porque no tiene que respetar la orientación.",
+        "Regla normal: busca una esquina que ya esté en su rincón correcto —sus tres colores coinciden con los de ese rincón, sin importar cómo esté girada—. Cuando la tengas, gira el CUBO ENTERO (no sólo la cara de arriba) para ponerla en frente-derecha, y aplica el algoritmo: esa hace de ancla y las otras tres rotan. Ojo con esto: para mover el ancla se gira el cubo entero; si giras sólo la cara de arriba, descolocas lo que ya tenías. Si NINGUNA esquina está en su rincón, aplica el algoritmo una vez desde donde sea y aparecerá una; ya tienes ancla.",
+        "EL ATASCO (esto es lo que nunca se explica): a veces te quedas con DOS esquinas bien colocadas y las otras dos sólo necesitarían intercambiarse entre sí. Se reconoce enseguida: por más que busques ancla y cicles, esas dos jamás cuadran —y es lógico, un ciclo de tres no puede limitarse a intercambiar dos—. La salida es sencilla y a prueba de fallos: aplica el algoritmo UNA vez sin buscar ancla, desde cualquier posición (sí, vas a romper las dos que estaban bien). Eso deshace el empate y te deja un caso normal, que ya resuelves con su ancla. Nunca hacen falta más de dos pases en total.",
+      ],
       cases: [
-        { name: "Ciclo de 3 esquinas", alg: "U R U' L' U R' U' L", note: "No mires cómo están giradas, sólo si cada esquina tiene los tres colores correctos para ese rincón. Si una ya encaja, ponla en frente-derecha como ancla y aplica; repite. Si ninguna encaja, un pase coloca al menos una.", dia: { alg: "U R U' L' U R' U' L", mode: "pll" }, trace: TRACE_CORNERS_POS },
+        { name: "Ciclo de 3 esquinas", alg: "U R U' L' U R' U' L", note: "Cicla tres esquinas dejando fija la de frente-derecha. Úsalo con la regla de ancla; y si te atascas con dos a intercambiar, aplícalo una vez a ciegas para desbloquear.", dia: { alg: "U R U' L' U R' U' L", mode: "pll" }, trace: TRACE_CORNERS_POS },
       ],
     },
     {

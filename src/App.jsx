@@ -124,10 +124,19 @@ export default function App() {
       <div style={{ maxWidth: 920, margin: "0 auto" }}>
 
         {/* Cabecera */}
-        <header style={{ marginBottom: 18 }}>
+        <header style={{ marginBottom: 14 }}>
           <div style={{ fontFamily: FONT_MONO, fontSize: 12, color: T.accent, letterSpacing: 2, textTransform: "uppercase" }}>Cubo de Rubik · Guía visual</div>
           <h1 style={{ fontFamily: FONT_DISPLAY, fontWeight: 700, fontSize: 32, letterSpacing: -0.5, margin: "6px 0 0", textTransform: "uppercase", lineHeight: 1.05 }}>Resolver el cubo capa a capa</h1>
         </header>
+
+        {/* Guiño */}
+        <div style={{ background: "linear-gradient(90deg, " + T.panel2 + ", " + T.panel + ")", border: "1px dashed " + T.line, borderRadius: 12, padding: "11px 16px", marginBottom: 16, display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}>
+          <span style={{ fontSize: 16 }} aria-hidden>🦸</span>
+          <p style={{ fontFamily: FONT_BODY, fontSize: 13, color: T.muted, margin: 0, lineHeight: 1.55 }}>
+            <strong style={{ color: T.accent, fontFamily: FONT_DISPLAY, letterSpacing: 0.3 }}>Modo Aita:</strong> sistema de resolución extra fácil para esos <em>aitas</em> que quieren sacar pecho ante sus pequeños tiranos y dejarlos boquiabiertos.{" "}
+            <span style={{ color: T.text }}>P. D.: Mitx, con esto dejas a Adur flipando.</span> 🤯🧩
+          </p>
+        </div>
 
         {/* La idea de fondo */}
         <div style={{ borderLeft: "3px solid " + T.accent, background: T.panel, borderRadius: "0 12px 12px 0", padding: "14px 18px", marginBottom: 16 }}>

@@ -1,46 +1,55 @@
-// Verifica el método INFALIBLE "orientar de una en una" (sin reconocer casos).
-import { solved, applyAlg, invertAlg } from "../src/lib/cubeEngine.js";
+// ¿Todo caso de POSICIÓN de esquinas se resuelve con el 3-ciclo (eligiendo bien)? BFS.
+import { solved, applyAlg, stateAfter, doToken } from "../src/lib/cubeEngine.js";
 
+const A = "U R U' L' U R' U' L";
 const clone = (st) => st.map((s) => ({ c: s.c, p: s.p.slice(), n: s.n.slice() }));
-const stk = (st, x, y, z, n) => st.find((s) => s.p[0] === x && s.p[1] === y && s.p[2] === z && s.n[0] === n[0] && s.n[1] === n[1] && s.n[2] === n[2]);
-const orientedAt = (st, x, z) => stk(st, x, 1, z, [0, 1, 0]).c === "Y";
+const centerColor = (st, ax, sign) => { const p = [0, 0, 0]; p[ax] = sign; return st.find((s) => s.p.join() === p.join() && s.n[ax] === sign).c; };
+const cornerColors = (st, x, z) => st.filter((s) => s.p[0] === x && s.p[1] === 1 && s.p[2] === z).map((s) => s.c).sort().join("");
+function inPlace(st, x, z) {
+  const want = [centerColor(st, 1, 1), centerColor(st, 0, x), centerColor(st, 2, z)].sort().join("");
+  return cornerColors(st, x, z) === want;
+}
 const CORN = [[1, 1], [-1, 1], [1, -1], [-1, -1]];
-const allOriented = (st) => CORN.every(([x, z]) => orientedAt(st, x, z));
-const fullySolved = (st) => { const r = solved(); return st.every((s, i) => s.c === r.c && s.p.join() === r.p.join() && s.n.join() === r.n.join()); };
+const allInPlace = (st) => CORN.every(([x, z]) => inPlace(st, x, z));
+function solvableByU(st0) { for (let k = 0; k < 4; k++) { const st = clone(st0); for (let i = 0; i < k; i++) doToken(st, "U"); if (allInPlace(st)) return true; } return false; }
+const countInPlace = (st) => CORN.filter(([x, z]) => inPlace(st, x, z)).length;
 
-const OLLC = {
-  Sune: "R U R' U R U2 R'", Antisune: "R U2 R' U' R U' R'",
-  H: "R U R' U R U' R' U R U2 R'", Pi: "R U2 R2 U' R2 U' R2 U2 R",
-  T: "r U R' U' r' F R F'", U_hl: "R2 D R' U2 R D' R' U2 R'", L_bt: "F' r U R' U' r' F R",
-};
+// clave del estado = posición+identidad de las 4 esquinas (lo único que importa)
+const key = (st) => CORN.map(([x, z]) => cornerColors(st, x, z)).join("|");
 
-// Método: por cada esquina sin amarillo arriba, ponla en FUR (girando U) y repite
-// R' D' R D hasta que muestre amarillo arriba. Al final, U para realinear.
-function orientOneByOne(st0) {
-  let st = clone(st0); let trick = 0, uTurns = 0;
-  for (let guard = 0; guard < 30; guard++) {
-    if (allOriented(st)) break;
-    // trae una esquina NO orientada a FUR
-    let spins = 0;
-    while (orientedAt(st, 1, 1) && spins < 4) { applyAlg(st, "U"); uTurns++; spins++; }
-    // repite el truco hasta orientar esa esquina (sin tocar U)
-    let reps = 0;
-    while (!orientedAt(st, 1, 1) && reps < 6) { applyAlg(st, "R' D' R D"); trick++; reps++; }
+// BFS: en cada paso el solucionador puede girar el cubo (y^k) y aplicar A.
+function bfs(st0) {
+  if (solvableByU(st0)) return 0;
+  const seen = new Set([key(st0)]);
+  let frontier = [st0];
+  for (let depth = 1; depth <= 6; depth++) {
+    const next = [];
+    for (const st of frontier) {
+      for (let k = 0; k < 4; k++) {
+        const s = clone(st);
+        for (let i = 0; i < k; i++) doToken(s, "y");
+        applyAlg(s, A);
+        if (solvableByU(s)) return depth;
+        const kk = key(s);
+        if (!seen.has(kk)) { seen.add(kk); next.push(s); }
+      }
+    }
+    frontier = next;
   }
-  return { oriented: allOriented(st), tricks: trick };
+  return -1;
 }
 
-console.log("Método 'de una en una' (R' D' R D), por caso:");
-let allOk = true;
-for (const [n, a] of Object.entries(OLLC)) {
-  const st = solved(); applyAlg(st, invertAlg(a));
-  const r = orientOneByOne(st);
-  if (!r.oriented) allOk = false;
-  console.log(`  ${n.padEnd(12)} -> ${r.oriented ? "TODAS amarillas ✓" : "FALLA ✗"}  (${r.tricks} repeticiones del truco)`);
+const CASES = {
+  "Aa · 3-ciclo": "x R' U R' D2 R U' R' D2 R2 x'",
+  "T · 2 adyacentes a intercambiar": "R U R' U' R' F R2 U' R' U' R U R' F'",
+  "Ja · 2 adyacentes a intercambiar": "R' U L' U2 R U' R' U2 R L",
+  "Y · 2 diagonales a intercambiar": "F R U' R' U' R U R' F' R U R' U' R' F R F'",
+  "E · doble diagonal": "x' R U' R' D R U R' D' R U R' D R U' R' D' x",
+  "Na · doble intercambio": "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'",
+  "V · diagonal": "R' U R' U' y R' F' R2 U' R' U R' F R F y'",
+};
+console.log("Aplicaciones MÍNIMAS del 3-ciclo para colocar esquinas (eligiendo bien):\n");
+for (const [name, alg] of Object.entries(CASES)) {
+  const st = stateAfter(alg);
+  console.log(`  ${name.padEnd(34)} bien=${countInPlace(st)}  →  ${bfs(st)} aplicaciones`);
 }
-console.log("\n¿Funciona para TODOS los casos?", allOk ? "SÍ ✓" : "no");
-
-// Comprobación de que 2 y 4 repeticiones giran la esquina 120/240 (sin tocar U)
-const st = solved();
-console.log("\nUna esquina de la cara amarilla, repitiendo R' D' R D (debe volver a su sitio cada 6):");
-let s2 = solved(); for (let i = 1; i <= 6; i++) { applyAlg(s2, "R' D' R D"); if (fullySolved(s2)) console.log("  vuelve a resuelto tras", i, "repeticiones"); }
